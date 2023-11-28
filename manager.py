@@ -12,8 +12,6 @@ class level_setup:
         self.enemy_group = pygame.sprite.Group()
         self.projectile_group = pygame.sprite.Group()
         self.world_shift = 0
-
-        self.onGround = True
         self.level_setup(layout)
         
     def level_setup(self, layout):
@@ -36,48 +34,61 @@ class level_setup:
 
     def scroll_x(self):
         player = self.player_group.sprite
-        player_x = player.rect.centerx
-        direction = player.direction.x
-        speed = player.x_speed
+        if player:
+            player_x = player.rect.centerx
+            direction = player.direction.x
+            speed = player.x_speed
 
-        if player_x >= 650 and direction > 0:
-            self.world_shift = -8
-            player.x_speed = 0
-            
-        elif player_x <= 10 and direction < 0:
-            self.world_shift = 8
-            player.x_speed = 0
-        else:
-            self.world_shift = 0
-            player.x_speed = 8
+            if player_x >= 650 and direction > 0:
+                self.world_shift = -8
+                player.x_speed = 0
+                
+            elif player_x <= 10 and direction < 0:
+                self.world_shift = 8
+                player.x_speed = 0
+            else:
+                self.world_shift = 0
+                player.x_speed = 8
     
     def collision_x(self):
         player = self.player_group.sprite
-
-        player.rect.x += player.x_speed * player.direction.x
-        for tile in self.tiles_group.sprites():
-            if tile.rect.colliderect(player.rect):
-                if player.direction.x < 0:                #detection if collision is on right or left    
-                    player.rect.left = tile.rect.right    #left of the player will placed on right side of the tile
-                elif player.direction.x > 0:
-                    player.rect.right = tile.rect.left
+        if player:
+            player.rect.x += player.x_speed * player.direction.x
+            for tile in self.tiles_group.sprites():
+                if tile.rect.colliderect(player.rect):
+                    if player.direction.x < 0:                #detection if collision is on right or left    
+                        player.rect.left = tile.rect.right    #left of the player will placed on right side of the tile
+                    elif player.direction.x > 0:
+                        player.rect.right = tile.rect.left
                 
     def collision_y(self):
         player = self.player_group.sprite
+        if player:
+            player.gravitation()
 
-        player.gravitation()
-
-        for tile in self.tiles_group.sprites():
-            if tile.rect.colliderect(player.rect):
-                if player.direction.y < 0:  # Collision from above
-                    player.rect.top = tile.rect.bottom
-                    
-                elif player.direction.y > 0:  # Collision from below
-                    player.rect.bottom = tile.rect.top
-                    player.direction.y = 0  # Stop vertical movement
-                    player.onGround = True
-            if player.onGround and player.direction.y < 0 and player.direction.y > 1:
-                player.onGround = False
+            for tile in self.tiles_group.sprites():
+                if tile.rect.colliderect(player.rect):
+                    if player.direction.y < 0:  # Collision from above
+                        player.rect.top = tile.rect.bottom
+                        
+                    elif player.direction.y > 0:  # Collision from below
+                        player.rect.bottom = tile.rect.top
+                        player.direction.y = 0  # Stop vertical movement
+                        player.onGround = True
+                if player.onGround and player.direction.y < 0 and player.direction.y > 1:
+                    player.onGround = False
+    
+    def collision_player_enemy(self):
+        player = self.player_group.sprite
+        if player:
+            enemy_hit_list = pygame.sprite.spritecollide(player, self.enemy_group, False)
+            
+            if player.is_slashing :
+                
+                for enemy in enemy_hit_list:
+                    enemy.kill()
+            
+            
     def update_tiles_position(self):
         for tile in self.tiles_group:
             tile.rect.x += self.world_shift  # Update tile positions based on shift direction
@@ -87,18 +98,21 @@ class level_setup:
             proj.rect.x += self.world_shift  # Update tile positions based on shift direction
     
     def collision_projectiles(self):
-        for projectile in self.projectile_group.sprites():
-           
-            if pygame.sprite.spritecollideany(projectile, self.tiles_group):
-                projectile.kill()  
+        player = self.player_group.sprite
+        if player:
+            for projectile in self.projectile_group.sprites():
+            
+                if pygame.sprite.spritecollideany(projectile, self.tiles_group):
+                    projectile.kill()  
 
-            # Check collision with player
-            player_hit = pygame.sprite.spritecollideany(projectile, self.player_group)
-            if player_hit:
-                # player_hit.onHit()  
-                projectile.kill()  
-
-
+                # Check collision with player
+                player_hit = pygame.sprite.spritecollideany(projectile, self.player_group)
+                if player_hit:
+                    player.health -= 1  
+                    projectile.kill()  
+                if player.health <= 0:
+                    player.kill()
+                    break
     def enemy_to_reverse(self):
         for enemy in self.enemy_group.sprites():
             for tile in self.tiles_group.sprites():
@@ -120,7 +134,7 @@ class level_setup:
         self.player_group.update()
         self.enemy_group.update()
         self.enemy_to_reverse()
-
+        self.collision_player_enemy()
         for proj in projectiles:
             self.projectile_group.add(proj)
 

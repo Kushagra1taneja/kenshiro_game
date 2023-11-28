@@ -4,9 +4,9 @@ stage1 = [
     '                                                                       ',
     '                                                                       ',
     ' x                     k                    x                          ',
-    'xxxx    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx ',
+    'xxxx                    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx ',
     '                                                                       ',
-    'xxxx  p    xxxxxxxx   xx w    xxxx                                     ',
+    'xxxx  p                  w    xxxx                                     ',
     'xxxxxxxxx  xxxxxxxxxxxxxxxxxxxxxxxxxx                                  ',
     'xxxxxxxxx  xxxxxxxxxxxxxxxxxxxxxxxxxx                                  ',]
 
