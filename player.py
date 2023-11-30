@@ -17,7 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.x_speed = 8
         self.direction = pygame.math.Vector2(0, 0)
         self.y_speed = -16
-        self.health = 10
+        self.health = 1000
         # player physics
         self.gravity = 0.8
 
@@ -47,6 +47,7 @@ class Player(pygame.sprite.Sprite):
         
         if self.onGround:
             self.rect = self.image.get_rect(midbottom=self.rect.midbottom)
+        
         if not self.is_slashing:
             
             animation = self.animations[self.status]
@@ -60,8 +61,6 @@ class Player(pygame.sprite.Sprite):
                 self.image = pygame.transform.flip(image, True, False)
             else:
                 self.image = image
-
-
 
     def attack_animate(self):
         if self.status != 'slash':
