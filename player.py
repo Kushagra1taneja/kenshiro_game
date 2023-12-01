@@ -29,7 +29,7 @@ class Player(pygame.sprite.Sprite):
         # slash animation attributes
         self.slash_animation = self.animations['slash']
         self.slash_frame_index = 0
-        self.slash_animation_speed = 0.15
+        self.slash_animation_speed = 0.30
         self.is_slashing = False
         
     def import_player_animation(self):
@@ -92,7 +92,7 @@ class Player(pygame.sprite.Sprite):
             self.direction.x = -1
         elif keys[pygame.K_d]:
             self.direction.x = 1
-        elif keys[pygame.K_x]:
+        elif keys[pygame.K_v]:
             self.attack_animate()
         else:
             self.direction.x = 0
