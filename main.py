@@ -14,7 +14,7 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-    screen.fill((50, 50 ,50))
+    screen.fill('black')
     setup.run()
     pygame.display.update()
     clock.tick(60)
