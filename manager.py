@@ -86,7 +86,7 @@ class level_setup:
             if player.is_slashing :
                 
                 for enemy in enemy_hit_list:
-                    enemy.kill()
+                    enemy.health-=25
             
             
     def update_tiles_position(self):
@@ -124,6 +124,10 @@ class level_setup:
                     elif enemy.direction > 0:
                         enemy.rect.right = tile.rect.left
                         enemy.reverse_direction()
+                if enemy.distance >= 20 * tile_size:
+                    enemy.reverse_direction()
+                    enemy.distance = 0
+
    
     def run(self):
         self.update_tiles_position()  # Update tile positions

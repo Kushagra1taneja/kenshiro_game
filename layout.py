@@ -3,12 +3,12 @@ stage1 = [
     '                                                                       ',
     '                                                                       ',
     '                                                                       ',
-    ' x                     k                    x                          ',
-    'xxxx                    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx ',
+    ' x                                                                k xx ',
+    'xxxx                    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
     '                                                                       ',
-    'xxxx  p                  w    xxxx                                     ',
-    'xxxxxxxxx  xxxxxxxxxxxxxxxxxxxxxxxxxx                                  ',
-    'xxxxxxxxx  xxxxxxxxxxxxxxxxxxxxxxxxxx                                  ',]
+    'xxxx  p      w                                  x           ',
+    'xxxxxxxxx  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                               ',
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                  ',]
 
 tile_size = 32
 screen_width = 750

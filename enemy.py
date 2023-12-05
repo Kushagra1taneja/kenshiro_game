@@ -13,7 +13,7 @@ class BaseEnemy(pygame.sprite.Sprite):
         self.rect.topleft = (x, y-2)
         self.projectile_frequency = projectile_frequency  # Fire every 120 frames
         self.projectile_timer = 0
-
+        self.distance=0;
        
         self.speed = speed 
         self.direction = 1  
@@ -26,16 +26,18 @@ class BaseEnemy(pygame.sprite.Sprite):
         
 
     def update(self):
-        self.rect.x += self.speed * self.direction;
+
         self.projectile_timer += 1;
-        
-        if self.toreverse :
-            self.reverse_direction()
-            self.toreverse=False
+        self.distance += abs(self.speed)
+        if self.health<=0:
+            self.kill()
+
 
         if self.projectile_timer >= self.projectile_frequency:
             self.shoot_projectile()
             self.projectile_timer = 0
+        else :
+            self.rect.x += self.speed * self.direction
         
 
     def reverse_direction(self):
@@ -43,12 +45,12 @@ class BaseEnemy(pygame.sprite.Sprite):
     
 class Knight(BaseEnemy):
     def __init__(self, x, y):
-        super().__init__(x, y, health=100 , speed=3, projectile_frequency=60)
+        super().__init__(x, y, health=100 , speed=2, projectile_frequency=120)
         self.image.fill((255, 0, 0))  
 
 class Pawn(BaseEnemy):
     def __init__(self, x, y):
-        super().__init__(x, y, health=40 , speed=1, projectile_frequency=120)
+        super().__init__(x, y, health=5000 , speed=1, projectile_frequency=240)
         self.image.fill((0, 255, 0))  
 
 class Queen(BaseEnemy):
