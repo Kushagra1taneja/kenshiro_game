@@ -5,7 +5,7 @@ class Projectile(pygame.sprite.Sprite):
         super().__init__()
 
       
-        self.image = pygame.Surface((8, 8))  
+        self.image = pygame.Surface((4, 4))  
         self.image.fill((0, 200, 0)) 
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
