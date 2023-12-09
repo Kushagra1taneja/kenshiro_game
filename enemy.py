@@ -62,18 +62,24 @@ class BaseEnemy(pygame.sprite.Sprite):
                 temp_list.append(img)
             self.animation_list.append(temp_list)
 
-
-        self.image = self.animation_list[self.action][self.frame_index]    
+        if self.flip :
+            oringnalimage = self.animation_list[self.action][self.frame_index]    
+            self.image = pygame.transform.flip(oringnalimage, True, False)
+            
+        else :
+            self.image = self.animation_list[self.action][self.frame_index] 
+        
         self.rect = self.image.get_rect()
         self.rect.center = (x,y+3)
     
     def draw(self):
-        screen.blit(pygame.transform.flip(self.image,self.flip, False),self.rect)
+        screen.blit(self.image,self.rect)
     
     def update_animation(self):
         ANIMATION_COOLDOWN = 100
+        current_time = pygame.time.get_ticks()
         self.image = self.animation_list[self.action][self.frame_index]
-        if ((pygame.time.get_ticks() - self.update_time) > ANIMATION_COOLDOWN):
+        if ((current_time - self.update_time) > ANIMATION_COOLDOWN):
             self.update_time = pygame.time.get_ticks()
             self.frame_index += 1
         
@@ -96,15 +102,22 @@ class BaseEnemy(pygame.sprite.Sprite):
                        
     def shoot_projectile(self):
         # Create a new projectile instance
-        projectile = Projectile(self.rect.centerx, self.rect.centery, self.direction)
+        projectile = Projectile(self.rect.centerx+(self.image.get_width())*self.direction*0.6, self.rect.centery, self.direction)
         projectiles.add(projectile)
 
-        
+    def reverse_direction(self):
+        self.direction *= -1    
+        if(self.direction < 0):
+            self.flip = True
+        elif(self.direction > 0):
+            self.flip = False
 
     def update(self):
         self.rect.x += self.speed * self.direction
         self.projectile_timer += 1
+        self.update_animation()
         
+
         if self.toreverse :
             self.reverse_direction()
             self.toreverse=False
@@ -112,10 +125,15 @@ class BaseEnemy(pygame.sprite.Sprite):
         if self.projectile_timer >= self.projectile_frequency:
             self.shoot_projectile()
             self.projectile_timer = 0
-        
+        if self.flip :
+            oringnalimage = self.animation_list[self.action][self.frame_index]    
+            self.image = pygame.transform.flip(oringnalimage, True, False)
+            
+        else :
+            self.image = self.animation_list[self.action][self.frame_index] 
+               
 
-    def reverse_direction(self):
-        self.direction *= -1
+
     
 
 class Knight(BaseEnemy):
