@@ -5,8 +5,9 @@ class Projectile(pygame.sprite.Sprite):
         super().__init__()
 
       
-        self.image = pygame.Surface((8, 8))  
-        self.image.fill((0, 200, 0)) 
+        self.image = pygame.Surface((4, 4))  
+        image= pygame.image.load(f'graphics\\bullet\\bullet.png') 
+        self.image=pygame.transform.scale_by(image,0.5)
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
         self.counter = 0
