@@ -3,8 +3,7 @@ from pytmx.util_pygame import load_pygame
 from tiles import*
 from settings import tile_size
 from player import*
-# from support import import_csv_layout,import_cut_graphics
-# from layout import load_tiles
+from enemy import*
 
 class Level:
     def __init__(self,surface):
@@ -17,7 +16,7 @@ class Level:
         self.cosmetics_sprites = self.load_tiles('cosmetics')
         self.fakes_sprites = self.load_tiles('fakes')
         #tiles that are going to collide
-        self.enemy_sprites = self.load_tiles('enemy')
+        self.enemy_sprites = self.load_character_tiles('enemy')
         self.player_sprites = self.load_character_tiles('player')
         #tiles with special purpose
         self.destination_sprites = self.load_tiles('start/end')
@@ -25,8 +24,10 @@ class Level:
         #tiles that should not ignored by collision detection
         self.ground_sprites = self.load_tiles('ground')
         self.float_sprites = self.load_tiles('float')
-        self.catacomb_sprites = self.load_tiles('catacomb')
+        # self.catacomb_sprites = self.load_tiles('catacomb')
         self.steps_sprites = self.load_tiles('steps')
+
+        self.projectile_group = pygame.sprite.Group()
 
     def load_tiles(self,layer_name):
         tmx_data = load_pygame('graphics/Environment/Tiled_tsx/level_0.tmx')
@@ -43,16 +44,21 @@ class Level:
     
     def load_character_tiles(self,layer_name):
         tmx_data = load_pygame('graphics/Environment/Tiled_tsx/level_0.tmx')
-        sprite_group = pygame.sprite.GroupSingle()
 
-            # for layer in tmx_data.layers:
-            #     if hasattr(layer, 'data'):
-        layer = tmx_data.get_layer_by_name(layer_name)
-        for x, y, surf in layer.tiles():
-            # pos = (x * tile_size, y * tile_size)
-            # Tile(pos=pos, x=x, y=y, surf=surf, groups=sprite_group)
-            player_sprite = Player(x*tile_size,y*tile_size)
-            sprite_group.add(player_sprite)
+
+        if layer_name == "player":
+            sprite_group = pygame.sprite.GroupSingle()
+            layer = tmx_data.get_layer_by_name(layer_name)
+            for x, y, surf in layer.tiles():
+                player_sprite = Player(x*tile_size,y*tile_size)
+                sprite_group.add(player_sprite)
+
+        if layer_name == "enemy":
+            sprite_group = pygame.sprite.Group()
+            layer = tmx_data.get_layer_by_name(layer_name)
+            for x, y, surf in layer.tiles():
+                player_sprite = Pawn(x*tile_size,y*tile_size)
+                sprite_group.add(player_sprite)
 
         return sprite_group
     
@@ -85,12 +91,21 @@ class Level:
                     elif player.direction.x > 0:
                         player.rect.right = tile.rect.left
 
-            for tile in self.catacomb_sprites.sprites():
+            for tile in self.float_sprites.sprites():
                 if tile.rect.colliderect(player.rect):
                     if player.direction.x < 0:                #detection if collision is on right or left    
                         player.rect.left = tile.rect.right    #left of the player will placed on right side of the tile
                     elif player.direction.x > 0:
                         player.rect.right = tile.rect.left
+
+            for tile in self.steps_sprites.sprites():
+                if tile.rect.colliderect(player.rect):
+                    if player.direction.x < 0:                #detection if collision is on right or left    
+                        player.rect.left = tile.rect.right    #left of the player will placed on right side of the tile
+                    elif player.direction.x > 0:
+                        player.rect.right = tile.rect.left
+
+            
                 
     def collision_y(self):
         player = self.player_sprites.sprite
@@ -109,7 +124,7 @@ class Level:
                 if player.onGround and player.direction.y < 0 and player.direction.y > 1:
                     player.onGround = False
 
-            for tile in self.catacomb_sprites.sprites():
+            for tile in self.float_sprites.sprites():
                 if tile.rect.colliderect(player.rect):
                     if player.direction.y < 0:  # Collision from above
                         player.rect.top = tile.rect.bottom
@@ -120,6 +135,19 @@ class Level:
                         player.onGround = True
                 if player.onGround and player.direction.y < 0 and player.direction.y > 1:
                     player.onGround = False
+
+            for tile in self.steps_sprites.sprites():
+                if tile.rect.colliderect(player.rect):
+                    if player.direction.y < 0:  # Collision from above
+                        player.rect.top = tile.rect.bottom
+                        
+                    elif player.direction.y > 0:  # Collision from below
+                        player.rect.bottom = tile.rect.top
+                        player.direction.y = 0  # Stop vertical movement
+                        player.onGround = True
+                if player.onGround and player.direction.y < 0 and player.direction.y > 1:
+                    player.onGround = False
+            
     
     
     def collision_player_enemy(self):
@@ -134,29 +162,29 @@ class Level:
             
             
     def update_tiles_position(self):
-        for tile in self.ground_sprites:
-            tile.rect.x += self.world_shift  # Update tile positions based on shift direction
+        # for tile in self.ground_sprites:
+        #     tile.rect.x += self.world_shift  # Update tile positions based on shift direction
         for enemy in self.enemy_sprites:
             enemy.rect.x += self.world_shift  # Update tile positions based on shift direction
-        # for proj in self.projectile_group:
-        #     proj.rect.x += self.world_shift  # Update tile positions based on shift direction
+        for proj in self.projectile_group:
+            proj.rect.x += self.world_shift  # Update tile positions based on shift direction
     
-    # def collision_projectiles(self):
-    #     player = self.player_group.sprite
-    #     if player:
-    #         for projectile in self.projectile_group.sprites():
+    def collision_projectiles(self):
+        player = self.player_sprites.sprite
+        if player:
+            for projectile in self.projectile_group.sprites():
             
-    #             if pygame.sprite.spritecollideany(projectile, self.tiles_group):
-    #                 projectile.kill()  
+                if pygame.sprite.spritecollideany(projectile, self.ground_sprites):
+                    projectile.kill()  
 
-    #             # Check collision with player
-    #             player_hit = pygame.sprite.spritecollideany(projectile, self.player_group)
-    #             if player_hit:
-    #                 player.health -= 1  
-    #                 projectile.kill()  
-    #             if player.health <= 0:
-    #                 player.kill()
-    #                 break
+                # Check collision with player
+                player_hit = pygame.sprite.spritecollideany(projectile, self.player_sprites)
+                if player_hit:
+                    player.health -= 1  
+                    projectile.kill()  
+                if player.health <= 0:
+                    player.kill()
+                    break
 
 
     def enemy_to_reverse(self):
@@ -170,27 +198,16 @@ class Level:
                     elif enemy.direction > 0:
                         enemy.rect.right = tile.rect.left
                         enemy.reverse_direction()
-   
-    # def run(self):
-    #     self.update_tiles_position()  # Update tile positions
-    #     self.level.ground_sprites.draw(self.display)
-    #     self.level.player_sprites.draw(self.display)
-    #     self.level.enemy_sprites.draw(self.display)
-        
-    #     self.level.player_sprites.update(self.world_shift)
-    #     self.level.enemy_sprites.update(self.world_shift)
-    #     self.enemy_to_reverse()
-    #     # self.collision_player_enemy()
-    #     # for proj in projectiles:
-    #     #     self.projectile_group.add(proj)
 
-    #     # self.projectile_group.draw(self.display)
-    #     # self.projectile_group.update()
-    #     # self.collision_projectiles()
-    #     self.collision_x()
-    #     self.collision_y()
-    #     self.scroll_x()
+            for tile in self.destination_sprites.sprites():
 
+                if tile.rect.colliderect(enemy.rect):
+                    if enemy.direction < 0:                #detection if collision is on right or left    
+                        enemy.rect.left = tile.rect.right    #left of the player will placed on right side of the tile
+                        enemy.reverse_direction()
+                    elif enemy.direction > 0:
+                        enemy.rect.right = tile.rect.left
+                        enemy.reverse_direction()
 
     def run(self):
         #run the level for entire game
@@ -203,7 +220,9 @@ class Level:
         self.fakes_sprites.update(self.world_shift)
         self.fakes_sprites.draw(self.display_surface)
 
-        self.enemy_sprites.update(self.world_shift)
+        # for enemy in self.enemy_sprites:
+        self.update_tiles_position()
+        self.enemy_sprites.update()
         self.enemy_sprites.draw(self.display_surface)
 
         self.player_sprites.update()
@@ -221,20 +240,20 @@ class Level:
         self.float_sprites.update(self.world_shift)
         self.float_sprites.draw(self.display_surface)
 
-        self.catacomb_sprites.update(self.world_shift)
-        self.catacomb_sprites.draw(self.display_surface)
+        # self.catacomb_sprites.update(self.world_shift)
+        # self.catacomb_sprites.draw(self.display_surface)
 
         self.steps_sprites.update(self.world_shift)
         self.steps_sprites.draw(self.display_surface)
 
         self.enemy_to_reverse()
-        # self.collision_player_enemy()
-        # for proj in projectiles:
-        #     self.projectile_group.add(proj)
+        self.collision_player_enemy()
+        for proj in projectiles:
+            self.projectile_group.add(proj)
 
-        # self.projectile_group.draw(self.display)
-        # self.projectile_group.update()
-        # self.collision_projectiles()
+        self.projectile_group.draw(self.display_surface)
+        self.projectile_group.update()
+        self.collision_projectiles()
         self.collision_x()
         self.collision_y()
         self.scroll_x()

@@ -19,7 +19,7 @@ class Player(pygame.sprite.Sprite):
         self.y_speed = -16
         self.health = 1000
         # player physics
-        self.gravity = 0.8
+        self.gravity = 1.5
 
         # player state
         self.status = 'idle'
@@ -88,11 +88,11 @@ class Player(pygame.sprite.Sprite):
     def get_input(self):
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_a]:
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
             self.direction.x = -1
-        elif keys[pygame.K_d]:
+        elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             self.direction.x = 1
-        elif keys[pygame.K_x]:
+        elif keys[pygame.K_x] or keys[pygame.K_v]:
             self.attack_animate()
         else:
             self.direction.x = 0

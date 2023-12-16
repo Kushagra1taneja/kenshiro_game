@@ -1,6 +1,6 @@
 import pygame
-from layout import screen_height
-from layout import screen_width
+from settings import screen_height
+from settings import screen_width
 
 from projectile import Projectile
 import os
