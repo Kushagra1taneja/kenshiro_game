@@ -2,7 +2,7 @@ import pygame
 from importer import import_folder
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, surface):
         super().__init__()
         self.import_player_animation()
 
@@ -16,22 +16,28 @@ class Player(pygame.sprite.Sprite):
         # player attributes
         self.x_speed = 8
         self.direction = pygame.math.Vector2(0, 0)
-        self.y_speed = -16
-        self.health = 1000
+        self.y_speed = -25
+        self.health = 10
         # player physics
         self.gravity = 1.5
 
         # player state
         self.status = 'idle'
         self.facing_right = True
-        self.onGround = False  # Start the player off the ground
+        self.onGround = False  
 
         # slash animation attributes
         self.slash_animation = self.animations['slash']
         self.slash_frame_index = 0
         self.slash_animation_speed = 0.15
         self.is_slashing = False
+        self.screen = surface
         
+        self.pixelfont_small = pygame.font.Font("Font//vermin_vibes_1989.ttf", 40)
+
+        #SOUND EFFECTS:
+        self.slashsound = pygame.mixer.Sound("Audio\slash_effect.mp3")
+        self.jumpsound = pygame.mixer.Sound("Audio\jump.mp3")
     def import_player_animation(self):
         base_path = 'graphics\\Hero\\'
         self.animations = {
@@ -66,7 +72,8 @@ class Player(pygame.sprite.Sprite):
         if self.status != 'slash':
             self.is_slashing = True
             self.status = 'slash'
-
+            self.slashsound.play()
+        
     def animate_slash(self):
         if self.is_slashing:
             self.image = self.slash_animation[int(self.slash_frame_index)]
@@ -100,11 +107,15 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE] and self.onGround and self.is_slashing == False:
             self.jump()
         
-
+    def update_armor_text(self):
+        armor_text = f"ARMOUR: {self.health}" 
+        self.pixelfont_small_image = self.pixelfont_small.render(armor_text, False, "Red")
+        self.pixelrect = self.pixelfont_small_image.get_rect(topleft=(10, 10))  
+        self.screen.blit(self.pixelfont_small_image, self.pixelrect)
     def jump(self):
         self.direction.y = self.y_speed
         self.onGround = False
-
+        self.jumpsound.play()
     def gravitation(self):
         self.direction.y += self.gravity
         self.rect.y += self.direction.y
@@ -114,3 +125,4 @@ class Player(pygame.sprite.Sprite):
         self.animate()
         self.animation_state()
         self.animate_slash()
+        self.update_armor_text()

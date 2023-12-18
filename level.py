@@ -29,6 +29,7 @@ class Level:
 
         self.projectile_group = pygame.sprite.Group()
 
+    
     def load_tiles(self,layer_name):
         tmx_data = load_pygame('graphics/Environment/Tiled_tsx/level_0.tmx')
         sprite_group = pygame.sprite.Group()
@@ -50,7 +51,7 @@ class Level:
             sprite_group = pygame.sprite.GroupSingle()
             layer = tmx_data.get_layer_by_name(layer_name)
             for x, y, surf in layer.tiles():
-                player_sprite = Player(x*tile_size,y*tile_size)
+                player_sprite = Player(x*tile_size,y*tile_size, self.display_surface)
                 sprite_group.add(player_sprite)
 
         if layer_name == "enemy":
@@ -153,12 +154,13 @@ class Level:
     def collision_player_enemy(self):
         player = self.player_sprites.sprite
         if player:
-            enemy_hit_list = pygame.sprite.spritecollide(player, self.enemy_sprites, False)
+            enemy_hit_list = pygame.sprite.spritecollide(player, self.enemy_sprites, False) #returns array
             
             if player.is_slashing :
                 
                 for enemy in enemy_hit_list:
-                    enemy.kill()
+                    
+                    enemy.kill()  #Enemy sprite ko hata do
             
             
     def update_tiles_position(self):
