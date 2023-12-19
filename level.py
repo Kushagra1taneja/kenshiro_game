@@ -17,6 +17,7 @@ class Level:
         self.fakes_sprites = self.load_tiles('fakes')
         #tiles that are going to collide
         self.enemy_sprites = self.load_character_tiles('enemy')
+        self.enemy_2_sprites = self.load_character_tiles('Enemy')
         self.player_sprites = self.load_character_tiles('player')
         #tiles with special purpose
         self.destination_sprites = self.load_tiles('start/end')
@@ -24,7 +25,6 @@ class Level:
         #tiles that should not ignored by collision detection
         self.ground_sprites = self.load_tiles('ground')
         self.float_sprites = self.load_tiles('float')
-        # self.catacomb_sprites = self.load_tiles('catacomb')
         self.steps_sprites = self.load_tiles('steps')
 
         self.projectile_group = pygame.sprite.Group()
@@ -60,6 +60,14 @@ class Level:
             for x, y, surf in layer.tiles():
                 player_sprite = Pawn(x*tile_size,y*tile_size)
                 sprite_group.add(player_sprite)
+
+        if layer_name == "Enemy":
+            sprite_group = pygame.sprite.Group()
+            layer = tmx_data.get_layer_by_name(layer_name)
+            for x, y, surf in layer.tiles():
+                player_sprite = Queen(x*tile_size,y*tile_size)
+                sprite_group.add(player_sprite)
+
 
         return sprite_group
     
@@ -155,18 +163,27 @@ class Level:
         player = self.player_sprites.sprite
         if player:
             enemy_hit_list = pygame.sprite.spritecollide(player, self.enemy_sprites, False) #returns array
-            
+            Enemy_hit_list = pygame.sprite.spritecollide(player, self.enemy_2_sprites, False)
+
             if player.is_slashing :
                 
                 for enemy in enemy_hit_list:
                     
                     enemy.kill()  #Enemy sprite ko hata do
+
+                for enemy in Enemy_hit_list:
+                    
+                    enemy.kill()  #Enemy sprite ko hata do
+
+
             
             
     def update_tiles_position(self):
         # for tile in self.ground_sprites:
         #     tile.rect.x += self.world_shift  # Update tile positions based on shift direction
         for enemy in self.enemy_sprites:
+            enemy.rect.x += self.world_shift  # Update tile positions based on shift direction
+        for enemy in self.enemy_2_sprites:
             enemy.rect.x += self.world_shift  # Update tile positions based on shift direction
         for proj in self.projectile_group:
             proj.rect.x += self.world_shift  # Update tile positions based on shift direction
@@ -211,6 +228,28 @@ class Level:
                         enemy.rect.right = tile.rect.left
                         enemy.reverse_direction()
 
+        for enemy in self.enemy_2_sprites.sprites():
+            for tile in self.ground_sprites.sprites():
+
+                if tile.rect.colliderect(enemy.rect):
+                    if enemy.direction < 0:                #detection if collision is on right or left    
+                        enemy.rect.left = tile.rect.right    #left of the player will placed on right side of the tile
+                        enemy.reverse_direction()
+                    elif enemy.direction > 0:
+                        enemy.rect.right = tile.rect.left
+                        enemy.reverse_direction()
+                        
+            for tile in self.destination_sprites.sprites():
+
+                if tile.rect.colliderect(enemy.rect):
+                    if enemy.direction < 0:                #detection if collision is on right or left    
+                        enemy.rect.left = tile.rect.right    #left of the player will placed on right side of the tile
+                        enemy.reverse_direction()
+                    elif enemy.direction > 0:
+                        enemy.rect.right = tile.rect.left
+                        enemy.reverse_direction()
+
+
     def run(self):
         #run the level for entire game
         self.background_layer_sprites.update(self.world_shift)
@@ -226,6 +265,9 @@ class Level:
         self.update_tiles_position()
         self.enemy_sprites.update()
         self.enemy_sprites.draw(self.display_surface)
+
+        self.enemy_2_sprites.update()
+        self.enemy_2_sprites.draw(self.display_surface)
 
         self.player_sprites.update()
         self.player_sprites.draw(self.display_surface)

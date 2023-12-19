@@ -19,7 +19,7 @@ class Player(pygame.sprite.Sprite):
         self.y_speed = -25
         self.health = 10
         # player physics
-        self.gravity = 1.5
+        self.gravity = 2.5
 
         # player state
         self.status = 'idle'
