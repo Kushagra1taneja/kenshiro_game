@@ -19,9 +19,7 @@ class BaseEnemy(pygame.sprite.Sprite):
         super().__init__()
 
         self.toreverse= False
-        # self.image = pygame.Surface((30, 30)) #not required
-        # self.rect = self.image.get_rect()#not required
-        # self.rect.topleft = (x-10, y-2)#not required
+       
         self.projectile_frequency = projectile_frequency  # Fire every 120 frames
         self.projectile_timer = 0
 
@@ -29,17 +27,7 @@ class BaseEnemy(pygame.sprite.Sprite):
         self.direction = 1  
         self.health = health
        
-       #gopi start
-       
-       
-        # self.char_type = char_type
-        # self.flip = False
-        # self.animation_list =[]#main list of list of images
-        # self.frame_index = 0
-        # self.action = 0
-        # self.update_time = pygame.time.get_ticks()
-        
-        
+      
         self.char_type = char_type
         self.jump =False
         self.in_air = True
@@ -92,16 +80,9 @@ class BaseEnemy(pygame.sprite.Sprite):
             self.frame_index = 0
             self.update_time = pygame.time.get_ticks()
         
-    def update_1(self):
-        if(self.direction < 0):
-            self.flip = True
-        elif(self.direction > 0):
-            self.flip = False
-        # gopi end
-        
-                       
+
     def shoot_projectile(self):
-        # Create a new projectile instance
+     
         projectile = Projectile(self.rect.centerx+(self.image.get_width())*self.direction*0.6, self.rect.centery, self.direction)
         projectiles.add(projectile)
 
@@ -158,16 +139,6 @@ class Pawn(BaseEnemy):
         else:
             self.update_action(1) 
 
-class Queen(BaseEnemy):
-    def __init__(self, x, y):
-        super().__init__('Queen',x, y+10, health=200 , speed=1,projectile_frequency=120)
-
-        self.update_animation()
-        self.draw()
-        if(self.health > 0):
-            self.update_action(0)
-        else:
-            self.update_action(1)
 
 
 pygame.display.update()    
