@@ -65,7 +65,7 @@ class Level:
             sprite_group = pygame.sprite.Group()
             layer = tmx_data.get_layer_by_name(layer_name)
             for x, y, surf in layer.tiles():
-                player_sprite = Queen(x*tile_size,y*tile_size)
+                player_sprite = Knight(x*tile_size,y*tile_size)
                 sprite_group.add(player_sprite)
 
 
