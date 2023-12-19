@@ -18,5 +18,5 @@ class Projectile(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.speed * self.direction
         self.counter += 1
-        if self.counter>=570:
+        if self.counter>=50:
             self.kill()
