@@ -17,7 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.x_speed = 8
         self.direction = pygame.math.Vector2(0, 0)
         self.y_speed = -25
-        self.health = 10
+        self.health = 100
         # player physics
         self.gravity = 2.5
 
